@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>一つの花 ことばクイズ（実物写真版）</title>
+<style>
+:root {
+  --bg:#f7fbff; --card:#fff; --ink:#203040; --sub:#5c6b78;
+  --blue:#4d95d8; --blue2:#eaf5ff; --green:#2f9d67; --green2:#eaf8f0;
+  --red:#d85a5a; --red2:#fff0f0; --yellow:#fff4b8; --border:#d9e5ef;
+  --orange:#ef9f35; --orange2:#fff6e8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif}
+button,a.button{font:inherit;-webkit-tap-highlight-color:transparent}
+.app{max-width:1000px;margin:0 auto;padding:22px 18px 42px}
+header{text-align:center;margin-bottom:18px}
+h1{margin:0;font-size:clamp(28px,5vw,46px);letter-spacing:.04em}
+.subtitle{color:var(--sub);font-size:clamp(15px,2.3vw,20px);margin-top:7px}
+.panel{background:var(--card);border:2px solid var(--border);border-radius:24px;box-shadow:0 8px 26px rgba(40,90,120,.08);padding:clamp(18px,4vw,34px)}
+.start{text-align:center;padding-top:28px;padding-bottom:28px}
+.big-icon{font-size:76px;margin:8px}
+.start p{font-size:clamp(17px,2.5vw,22px);line-height:1.8;margin:10px 0 22px}
+.actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.primary,.builder,a.button{border:0;color:#fff;border-radius:18px;padding:16px 26px;min-width:220px;font-weight:700;font-size:clamp(18px,2.8vw,25px);cursor:pointer;text-decoration:none;display:inline-block}
+.primary{background:var(--blue);box-shadow:0 5px 0 #3077b7}
+.builder{background:var(--orange);box-shadow:0 5px 0 #c77a15}
+.primary:active,.builder:active{transform:translateY(3px);box-shadow:none}
+.builder-area{margin-top:25px;padding:18px;border:2px dashed #e5b15f;border-radius:18px;background:var(--orange2);text-align:left}
+.builder-area h2{font-size:20px;margin:0 0 8px}
+.builder-area p{margin:5px 0;line-height:1.6}
+.status{font-weight:700;margin-top:10px;white-space:pre-wrap}
+.save-link{display:none;background:var(--green);box-shadow:0 5px 0 #24764f;margin-top:12px;text-align:center}
+.quiz-top{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.count{font-weight:800;font-size:18px;white-space:nowrap}
+.progress{flex:1;height:15px;background:#e8eef3;border-radius:999px;overflow:hidden}
+.progress>div{height:100%;width:0;background:var(--blue);transition:width .25s}
+.word{display:inline-block;background:var(--yellow);border-radius:16px;padding:8px 16px;font-size:clamp(23px,4vw,36px);font-weight:800;margin-bottom:14px}
+.prompt{font-size:clamp(22px,3.6vw,34px);line-height:1.5;font-weight:800;margin:4px 0 22px}
+ruby rt{font-size:.48em;font-weight:500}
+.meaning-grid{display:grid;gap:14px}
+.choice{width:100%;border:2px solid #b9ccdc;background:#fff;border-radius:18px;padding:18px;text-align:left;font-size:clamp(18px,2.6vw,23px);line-height:1.55;font-weight:650;cursor:pointer;min-height:74px}
+.choice.wrong{background:var(--red2);border-color:var(--red);color:#8b3434}
+.choice.correct{background:var(--green2);border-color:var(--green);color:#1c7047}
+.choice:disabled{cursor:default;opacity:.93}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.photo-choice{border:3px solid #c8d7e4;background:#fff;border-radius:20px;padding:8px;overflow:hidden;cursor:pointer;min-height:230px}
+.photo-choice img{width:100%;height:240px;object-fit:cover;display:block;border-radius:13px;background:#eef3f7}
+.photo-choice.wrong{border-color:var(--red);background:var(--red2)}
+.photo-choice.correct{border-color:var(--green);background:var(--green2)}
+.img-error{height:240px;display:flex;align-items:center;justify-content:center;padding:15px;border-radius:13px;background:#eef3f7;color:#677783;font-weight:700}
+.feedback{margin-top:22px;border-radius:20px;padding:18px 20px;display:none}
+.feedback.show{display:block}
+.feedback.good{background:var(--green2);border:2px solid #a7dcbf}
+.feedback.bad{background:var(--red2);border:2px solid #efb6b6}
+.feedback-title{font-size:clamp(22px,3vw,29px);font-weight:900;margin-bottom:6px}
+.feedback-body{font-size:clamp(16px,2.2vw,20px);line-height:1.65}
+.illust{font-size:48px;margin:4px 8px 4px 0;vertical-align:middle}
+.next-row{display:flex;justify-content:flex-end;margin-top:18px}
+.next{display:none}
+.end{text-align:center}
+.trophy{font-size:74px}
+.score{font-size:clamp(28px,5vw,46px);font-weight:900;margin:15px 0 8px}
+.detail{color:var(--sub);font-size:clamp(16px,2.4vw,21px);line-height:1.7;margin-bottom:24px}
+.small-note{color:#697887;font-size:13px;margin-top:14px;line-height:1.6}
+details{margin-top:24px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 15px}
+summary{cursor:pointer;font-weight:700}
+details ul{line-height:1.65;padding-left:24px;font-size:13px}
+details a{color:#3b78b0}
+.hidden{display:none!important}
+.offline-badge{display:none;margin:14px auto 0;background:var(--green2);color:#1c7047;border:1px solid #a7dcbf;border-radius:999px;padding:7px 14px;width:max-content;font-weight:800}
+@media(max-width:700px){
+ .app{padding:14px 10px 28px} .panel{border-radius:18px;padding:18px 13px}
+ .photo-grid{grid-template-columns:1fr} .photo-choice{min-height:0}
+ .photo-choice img,.img-error{height:190px} .quiz-top{gap:8px}
+ .primary,.builder,a.button{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>『<ruby>一<rt>ひと</rt></ruby>つの<ruby>花<rt>はな</rt></ruby>』ことばクイズ</h1>
+  <div class="subtitle"><ruby>実物写真版<rt>じつぶつしゃしんばん</rt></ruby>：ことばの<ruby>意味<rt>いみ</rt></ruby>や<ruby>写真<rt>しゃしん</rt></ruby>を<ruby>見<rt>み</rt></ruby>て、3つの<ruby>中<rt>なか</rt></ruby>からえらぼう！</div>
+  <div id="offlineBadge" class="offline-badge">✓ 実物写真を内蔵したオフライン版</div>
+</header>
+
+<section id="startScreen" class="panel start">
+  <div class="big-icon">🌼</div>
+  <p><ruby>全<rt>ぜん</rt></ruby>16<ruby>問<rt>もん</rt></ruby>の中から、毎回ランダムに10問出ます。<br>
+  まちがえても<ruby>大丈夫<rt>だいじょうぶ</rt></ruby>。<ruby>正解<rt>せいかい</rt></ruby>するまで、もういちどえらべます。</p>
+  <div class="actions">
+    <button id="startBtn" class="primary">スタート</button>
+  </div>
+
+  <div id="builderArea" class="builder-area">
+    <h2>実物写真を入れた「完全オフライン版」を作る</h2>
+    <p>この作成用ファイルを<strong>ネットにつながったパソコン</strong>で開き、下のボタンを1回押してください。Wikimedia Commonsで現在有効な画像URLを確認してから、15<ruby>枚<rt>まい</rt></ruby>の<ruby>写真<rt>しゃしん</rt></ruby>をHTMLの中へ取り込みます。</p>
+    <p>できあがったHTMLは、あとからネットにつながっていなくても写真つきで動きます。</p>
+    <button id="buildBtn" class="builder">オフライン版を作る</button>
+    <div id="buildStatus" class="status"></div>
+    <a id="saveLink" class="button save-link" download="一つの花_ことばクイズ_実物写真_完全オフライン.html">完成したHTMLを保存</a>
+  </div>
+  <div class="small-note"><ruby>名前<rt>なまえ</rt></ruby>や<ruby>答<rt>こた</rt></ruby>えは<ruby>保存<rt>ほぞん</rt></ruby>しません。</div>
+</section>
+
+<section id="quizScreen" class="panel hidden">
+  <div class="quiz-top"><div id="count" class="count">1 / 10</div><div class="progress"><div id="bar"></div></div></div>
+  <div id="word" class="word"></div>
+  <div id="prompt" class="prompt"></div>
+  <div id="choices"></div>
+  <div id="feedback" class="feedback"><div id="feedbackTitle" class="feedback-title"></div><div id="feedbackBody" class="feedback-body"></div></div>
+  <div class="next-row"><button id="nextBtn" class="primary next">つぎへ</button></div>
+</section>
+
+<section id="endScreen" class="panel end hidden">
+  <div class="trophy">🎉</div>
+  <div class="score" id="score"></div>
+  <div class="detail" id="detail"></div>
+  <button id="restartBtn" class="primary">もういちど</button>
+</section>
+
+<details>
+<summary>画像の出典・ライセンス</summary>
+<p class="small-note">写真はWikimedia Commonsで再利用条件を確認できる画像を使用しています。表示用に縮小版を利用し、完全オフライン版では画像データをHTML内に格納します。</p>
+<ul><li><strong>Cosmos bipinnatus flowers.JPG</strong> — B.navez / CC BY-SA 3.0 （<a href="https://commons.wikimedia.org/wiki/File:Cosmos_bipinnatus_flowers.JPG" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Red tulips flowers.jpg</strong> — Vera Kratochvil / CC0 1.0 （<a href="https://commons.wikimedia.org/wiki/File:Red_tulips_flowers.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Veronica persica flower.jpg</strong> — Alex Abair / CC BY 4.0 （<a href="https://commons.wikimedia.org/wiki/File:Veronica_persica_flower.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>防空頭巾 (15376268860).jpg</strong> — MGdesigner / CC BY 2.0 （<a href="https://commons.wikimedia.org/wiki/File:%E9%98%B2%E7%A9%BA%E9%A0%AD%E5%B7%BE_(15376268860).jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Cycling helmet.JPG</strong> — Petar Milošević / CC BY-SA 3.0 （<a href="https://commons.wikimedia.org/wiki/File:Cycling_helmet.JPG" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Hand knitted cap for children.jpg</strong> — Christmas videos / CC BY-SA 4.0 （<a href="https://commons.wikimedia.org/wiki/File:Hand_knitted_cap_for_children.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Hakata station platform.jpg</strong> — Lc055a / CC BY-SA 3.0 （<a href="https://commons.wikimedia.org/wiki/File:Hakata_station_platform.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Bus stop shelter.jpg</strong> — Bidgee / CC BY-SA 3.0 （<a href="https://commons.wikimedia.org/wiki/File:Bus_stop_shelter.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Airport Terminal view.jpg</strong> — Munna Aawara / CC BY-SA 4.0 （<a href="https://commons.wikimedia.org/wiki/File:Airport_Terminal_view.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Single Rose.jpg</strong> — Nopple / CC0 1.0 （<a href="https://commons.wikimedia.org/wiki/File:Single_Rose.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Flowers bouquet.jpg</strong> — Kalaiyarasiselvam / CC BY-SA 4.0 （<a href="https://commons.wikimedia.org/wiki/File:Flowers_bouquet.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Potted Plant.jpg</strong> — Alabama Extension / CC0 1.0 （<a href="https://commons.wikimedia.org/wiki/File:Potted_Plant.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Kokera buki roof.jpg</strong> — Hiroyuki0904 / Public domain （<a href="https://commons.wikimedia.org/wiki/File:Kokera_buki_roof.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>JapaneseRoofTiles.jpg</strong> — Kowloonese / CC BY-SA 3.0 （<a href="https://commons.wikimedia.org/wiki/File:JapaneseRoofTiles.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+<li><strong>Japan, Thatched roof.jpg</strong> — Marie-Sophie Mejan / CC BY 4.0 （<a href="https://commons.wikimedia.org/wiki/File:Japan,_Thatched_roof.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>）</li>
+</ul>
+</details>
+</div>
+
+<script id="embeddedImages" type="application/json">{}</script>
+<script>
+const COMMONS_FILES = {"cosmos": "Cosmos bipinnatus flowers.JPG", "tulip": "Red tulips flowers.jpg", "veronica": "Veronica persica flower.jpg", "airhood": "防空頭巾 (15376268860).jpg", "helmet": "Cycling helmet.JPG", "knitcap": "Hand knitted cap for children.jpg", "platform": "Hakata station platform.jpg", "busstop": "Bus stop shelter.jpg", "airport": "Airport Terminal view.jpg", "single": "Single Rose.jpg", "bouquet": "Flowers bouquet.jpg", "potted": "Potted Plant.jpg", "kokera": "Kokera buki roof.jpg", "tiles": "JapaneseRoofTiles.jpg", "thatch": "Japan, Thatched roof.jpg"};
+const REMOTE_IMAGES = Object.fromEntries(
+  Object.entries(COMMONS_FILES).map(([key, filename]) => [
+    key,
+    `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(filename)}`
+  ])
+);
+const QUESTION_POOL = [{"id": "photo_cosmos", "type": "photo", "word": "コスモス", "prompt": "「コスモス」はどれでしょう？", "options": [{"key": "cosmos", "correct": true}, {"key": "tulip", "correct": false}, {"key": "veronica", "correct": false}], "explain": "コスモスは、ほそいくきに、ピンクや<ruby>白<rt>しろ</rt></ruby>などの<ruby>花<rt>はな</rt></ruby>をさかせる<ruby>植物<rt>しょくぶつ</rt></ruby>です。『<ruby>一<rt>ひと</rt></ruby>つの<ruby>花<rt>はな</rt></ruby>』では、お<ruby>父<rt>とう</rt></ruby>さんがゆみ<ruby>子<rt>こ</rt></ruby>に<ruby>一輪<rt>いちりん</rt></ruby>のコスモスをわたします。", "visual": "🌸"}, {"id": "photo_airhood", "type": "photo", "word": "<ruby>防空頭巾<rt>ぼうくうずきん</rt></ruby>", "prompt": "「<ruby>防空頭巾<rt>ぼうくうずきん</rt></ruby>」はどれでしょう？", "options": [{"key": "airhood", "correct": true}, {"key": "helmet", "correct": false}, {"key": "knitcap", "correct": false}], "explain": "<ruby>防空頭巾<rt>ぼうくうずきん</rt></ruby>は、<ruby>戦争中<rt>せんそうちゅう</rt></ruby>、<ruby>空襲<rt>くうしゅう</rt></ruby>などのときに<ruby>頭<rt>あたま</rt></ruby>を<ruby>守<rt>まも</rt></ruby>るためにかぶった、わたの<ruby>入<rt>はい</rt></ruby>った<ruby>頭巾<rt>ずきん</rt></ruby>です。この<ruby>物語<rt>ものがたり</rt></ruby>では、<ruby>戦争中<rt>せんそうちゅう</rt></ruby>のくらしを<ruby>表<rt>あらわ</rt></ruby>すものとして<ruby>出<rt>で</rt></ruby>てきます。", "visual": "🧢"}, {"id": "photo_platform", "type": "photo", "word": "プラットホーム", "prompt": "<ruby>駅<rt>えき</rt></ruby>の「プラットホーム」はどれでしょう？", "options": [{"key": "platform", "correct": true}, {"key": "busstop", "correct": false}, {"key": "airport", "correct": false}], "explain": "プラットホームは、<ruby>駅<rt>えき</rt></ruby>で<ruby>汽車<rt>きしゃ</rt></ruby>や<ruby>電車<rt>でんしゃ</rt></ruby>を<ruby>待<rt>ま</rt></ruby>ったり、<ruby>乗<rt>の</rt></ruby>り<ruby>降<rt>お</rt></ruby>りしたりする<ruby>場所<rt>ばしょ</rt></ruby>です。『<ruby>一<rt>ひと</rt></ruby>つの<ruby>花<rt>はな</rt></ruby>』では、ゆみ<ruby>子<rt>こ</rt></ruby>たちがお<ruby>父<rt>とう</rt></ruby>さんを<ruby>見送<rt>みおく</rt></ruby>る<ruby>駅<rt>えき</rt></ruby>の<ruby>場面<rt>ばめん</rt></ruby>に<ruby>出<rt>で</rt></ruby>てきます。", "visual": "🚉"}, {"id": "photo_ichirin", "type": "photo", "word": "<ruby>一輪<rt>いちりん</rt></ruby>", "prompt": "「<ruby>花<rt>はな</rt></ruby>を<ruby>一輪<rt>いちりん</rt></ruby>」と<ruby>言<rt>い</rt></ruby>えるのはどれでしょう？", "options": [{"key": "single", "correct": true}, {"key": "bouquet", "correct": false}, {"key": "potted", "correct": false}], "explain": "「<ruby>一輪<rt>いちりん</rt></ruby>」は、さいている<ruby>花<rt>はな</rt></ruby>を<ruby>一<rt>ひと</rt></ruby>つと<ruby>数<rt>かぞ</rt></ruby>える<ruby>言<rt>い</rt></ruby>い<ruby>方<rt>かた</rt></ruby>です。お<ruby>父<rt>とう</rt></ruby>さんがゆみ<ruby>子<rt>こ</rt></ruby>にわたしたコスモスも<ruby>一輪<rt>いちりん</rt></ruby>でした。", "visual": "🌹"}, {"id": "photo_tonton", "type": "photo", "word": "とんとんぶき", "prompt": "「とんとんぶき」に<ruby>近<rt>ちか</rt></ruby>い<ruby>屋根<rt>やね</rt></ruby>はどれでしょう？", "options": [{"key": "kokera", "correct": true}, {"key": "tiles", "correct": false}, {"key": "thatch", "correct": false}], "explain": "とんとんぶきは、うすい<ruby>木<rt>き</rt></ruby>の<ruby>板<rt>いた</rt></ruby>を<ruby>重<rt>かさ</rt></ruby>ねてふいた<ruby>屋根<rt>やね</rt></ruby>のことです。『<ruby>一<rt>ひと</rt></ruby>つの<ruby>花<rt>はな</rt></ruby>』では、<ruby>十年後<rt>じゅうねんご</rt></ruby>のゆみ<ruby>子<rt>こ</rt></ruby>の<ruby>家<rt>いえ</rt></ruby>のようすを<ruby>表<rt>あらわ</rt></ruby>すところに<ruby>出<rt>で</rt></ruby>てきます。", "visual": "🏠"}, {"id": "meaning_haikyu", "type": "meaning", "word": "<ruby>配給<rt>はいきゅう</rt></ruby>", "prompt": "「<ruby>配給<rt>はいきゅう</rt></ruby>」とは、どんなこと？", "options": [{"text": "<ruby>物<rt>もの</rt></ruby>が<ruby>足<rt>た</rt></ruby>りないときなどに、<ruby>決<rt>き</rt></ruby>められた<ruby>量<rt>りょう</rt></ruby>ずつ<ruby>人々<rt>ひとびと</rt></ruby>に<ruby>分<rt>わ</rt></ruby>けてわたすこと", "correct": true}, {"text": "ほしい<ruby>物<rt>もの</rt></ruby>を、<ruby>好<rt>す</rt></ruby>きなだけ<ruby>自由<rt>じゆう</rt></ruby>に<ruby>買<rt>か</rt></ruby>うこと", "correct": false}, {"text": "<ruby>家<rt>いえ</rt></ruby>で<ruby>作<rt>つく</rt></ruby>った<ruby>物<rt>もの</rt></ruby>を、<ruby>店<rt>みせ</rt></ruby>で<ruby>売<rt>う</rt></ruby>ること", "correct": false}], "explain": "<ruby>戦争中<rt>せんそうちゅう</rt></ruby>は、<ruby>食<rt>た</rt></ruby>べ<ruby>物<rt>もの</rt></ruby>などが<ruby>足<rt>た</rt></ruby>りませんでした。お<ruby>母<rt>かあ</rt></ruby>さんのかばんにも「<ruby>配給<rt>はいきゅう</rt></ruby>のきっぷ」が<ruby>入<rt>はい</rt></ruby>っています。きっぷなどをもとに、<ruby>決<rt>き</rt></ruby>められた<ruby>量<rt>りょう</rt></ruby>を<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>るしくみだったのですね。", "visual": "🍚🎫"}, {"id": "meaning_gunka", "type": "meaning", "word": "<ruby>軍歌<rt>ぐんか</rt></ruby>", "prompt": "「<ruby>軍歌<rt>ぐんか</rt></ruby>」とは、どんな<ruby>歌<rt>うた</rt></ruby>？", "options": [{"text": "<ruby>軍隊<rt>ぐんたい</rt></ruby>や<ruby>兵士<rt>へいし</rt></ruby>の<ruby>気持<rt>きも</rt></ruby>ちを<ruby>高<rt>たか</rt></ruby>めるためなどに<ruby>歌<rt>うた</rt></ruby>われた<ruby>歌<rt>うた</rt></ruby>", "correct": true}, {"text": "<ruby>赤<rt>あか</rt></ruby>ちゃんをねかせるために<ruby>歌<rt>うた</rt></ruby>う<ruby>歌<rt>うた</rt></ruby>", "correct": false}, {"text": "<ruby>運動会<rt>うんどうかい</rt></ruby>でおどるための<ruby>歌<rt>うた</rt></ruby>", "correct": false}], "explain": "<ruby>軍歌<rt>ぐんか</rt></ruby>は、<ruby>軍隊<rt>ぐんたい</rt></ruby>や<ruby>兵士<rt>へいし</rt></ruby>をはげますためなどに<ruby>歌<rt>うた</rt></ruby>われた<ruby>歌<rt>うた</rt></ruby>です。お<ruby>父<rt>とう</rt></ruby>さんを<ruby>見送<rt>みおく</rt></ruby>る<ruby>駅<rt>えき</rt></ruby>では、<ruby>勇<rt>いさ</rt></ruby>ましい<ruby>軍歌<rt>ぐんか</rt></ruby>がずっと<ruby>聞<rt>き</rt></ruby>こえていて、<ruby>戦争<rt>せんそう</rt></ruby>へ<ruby>向<rt>む</rt></ruby>かう<ruby>駅<rt>えき</rt></ruby>のようすが<ruby>伝<rt>つた</rt></ruby>わります。", "visual": "🎵"}, {"id": "meaning_kuchiguse", "type": "meaning", "word": "<ruby>口<rt>くち</rt></ruby>ぐせ", "prompt": "「<ruby>口<rt>くち</rt></ruby>ぐせ」とは、どんなもの？", "options": [{"text": "<ruby>何度<rt>なんど</rt></ruby>もくり<ruby>返<rt>かえ</rt></ruby>して、つい<ruby>言<rt>い</rt></ruby>ってしまう<ruby>言葉<rt>ことば</rt></ruby>", "correct": true}, {"text": "<ruby>一度<rt>いちど</rt></ruby>だけ、<ruby>小<rt>ちい</rt></ruby>さな<ruby>声<rt>こえ</rt></ruby>で<ruby>言<rt>い</rt></ruby>った<ruby>言葉<rt>ことば</rt></ruby>", "correct": false}, {"text": "<ruby>本<rt>ほん</rt></ruby>にだけ<ruby>書<rt>か</rt></ruby>かれているむずかしい<ruby>言葉<rt>ことば</rt></ruby>", "correct": false}], "explain": "<ruby>口<rt>くち</rt></ruby>ぐせは、つい<ruby>何度<rt>なんど</rt></ruby>も<ruby>言<rt>い</rt></ruby>ってしまう<ruby>言葉<rt>ことば</rt></ruby>です。ゆみ<ruby>子<rt>こ</rt></ruby>は「<ruby>一<rt>ひと</rt></ruby>つだけちょうだい。」をくり<ruby>返<rt>かえ</rt></ruby>します。この<ruby>言葉<rt>ことば</rt></ruby>がゆみ<ruby>子<rt>こ</rt></ruby>の<ruby>口<rt>くち</rt></ruby>ぐせになっていたのですね。", "visual": "💬"}, {"id": "meaning_shirazushirazu", "type": "meaning", "word": "<ruby>知<rt>し</rt></ruby>らず<ruby>知<rt>し</rt></ruby>らずのうちに", "prompt": "「<ruby>知<rt>し</rt></ruby>らず<ruby>知<rt>し</rt></ruby>らずのうちに」と<ruby>同<rt>おな</rt></ruby>じような<ruby>意味<rt>いみ</rt></ruby>はどれ？", "options": [{"text": "<ruby>自分<rt>じぶん</rt></ruby>でも<ruby>気<rt>き</rt></ruby>がつかないうちに", "correct": true}, {"text": "よく<ruby>考<rt>かんが</rt></ruby>えてから、わざと", "correct": false}, {"text": "みんなに<ruby>知<rt>し</rt></ruby>らせてから", "correct": false}], "explain": "「<ruby>知<rt>し</rt></ruby>らず<ruby>知<rt>し</rt></ruby>らずのうちに」は、<ruby>自分<rt>じぶん</rt></ruby>でも<ruby>気<rt>き</rt></ruby>がつかないうちに、という<ruby>意味<rt>いみ</rt></ruby>です。ゆみ<ruby>子<rt>こ</rt></ruby>は、お<ruby>母<rt>かあ</rt></ruby>さんがよく<ruby>言<rt>い</rt></ruby>う「<ruby>一<rt>ひと</rt></ruby>つだけ」という<ruby>言葉<rt>ことば</rt></ruby>を、<ruby>知<rt>し</rt></ruby>らず<ruby>知<rt>し</rt></ruby>らずのうちに<ruby>覚<rt>おぼ</rt></ruby>えていった、と<ruby>考<rt>かんが</rt></ruby>えるとわかりやすいですね。", "visual": "🤔"}, {"id": "meaning_taezu", "type": "meaning", "word": "たえず", "prompt": "「たえず」と<ruby>同<rt>おな</rt></ruby>じような<ruby>意味<rt>いみ</rt></ruby>はどれ？", "options": [{"text": "とぎれることなく、ずっと", "correct": true}, {"text": "ときどき、<ruby>少<rt>すこ</rt></ruby>しだけ", "correct": false}, {"text": "<ruby>一度<rt>いちど</rt></ruby>だけ、<ruby>急<rt>きゅう</rt></ruby>に", "correct": false}], "explain": "「たえず」は、とぎれることなく、ずっと、という<ruby>意味<rt>いみ</rt></ruby>です。お<ruby>父<rt>とう</rt></ruby>さんを<ruby>見送<rt>みおく</rt></ruby>る<ruby>駅<rt>えき</rt></ruby>では、<ruby>勇<rt>いさ</rt></ruby>ましい<ruby>軍歌<rt>ぐんか</rt></ruby>がたえず<ruby>聞<rt>き</rt></ruby>こえていました。つまり、<ruby>軍歌<rt>ぐんか</rt></ruby>がずっと<ruby>聞<rt>き</rt></ruby>こえていたのですね。", "visual": "⏳"}, {"id": "meaning_isamashii", "type": "meaning", "word": "<ruby>勇ましい<rt>いさましい</rt></ruby>", "prompt": "「<ruby>勇<rt>いさ</rt></ruby>ましい」に<ruby>近<rt>ちか</rt></ruby>い<ruby>意味<rt>いみ</rt></ruby>はどれ？", "options": [{"text": "<ruby>勢<rt>いきお</rt></ruby>いがあり、こわがらずに<ruby>進<rt>すす</rt></ruby>むようなようす", "correct": true}, {"text": "<ruby>元気<rt>げんき</rt></ruby>がなく、しずかにしているようす", "correct": false}, {"text": "こわくなって、にげたくなるようす", "correct": false}], "explain": "「<ruby>勇<rt>いさ</rt></ruby>ましい」は、<ruby>勢<rt>いきお</rt></ruby>いがあり、おそれずに<ruby>向<rt>む</rt></ruby>かっていくようすです。<ruby>物語<rt>ものがたり</rt></ruby>では「<ruby>勇<rt>いさ</rt></ruby>ましい<ruby>軍歌<rt>ぐんか</rt></ruby>」という<ruby>形<rt>かたち</rt></ruby>で<ruby>出<rt>で</rt></ruby>てきます。<ruby>戦争<rt>せんそう</rt></ruby>へ<ruby>行<rt>い</rt></ruby>く<ruby>人<rt>ひと</rt></ruby>をはげますような、<ruby>力強<rt>ちからづよ</rt></ruby>い<ruby>歌<rt>うた</rt></ruby>だったと<ruby>考<rt>かんが</rt></ruby>えられます。", "visual": "💪"}, {"id": "meaning_ayasu", "type": "meaning", "word": "あやす", "prompt": "<ruby>赤<rt>あか</rt></ruby>ちゃんを「あやす」とは、どんなこと？", "options": [{"text": "<ruby>声<rt>こえ</rt></ruby>をかけたり<ruby>動<rt>うご</rt></ruby>かしたりして、<ruby>機嫌<rt>きげん</rt></ruby>をよくしようとすること", "correct": true}, {"text": "<ruby>勉強<rt>べんきょう</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>を<ruby>出<rt>だ</rt></ruby>して、<ruby>答<rt>こた</rt></ruby>えさせること", "correct": false}, {"text": "<ruby>一人<rt>ひとり</rt></ruby>で<ruby>外<rt>そと</rt></ruby>へ<ruby>遊<rt>あそ</rt></ruby>びに<ruby>行<rt>い</rt></ruby>かせること", "correct": false}], "explain": "「あやす」は、<ruby>赤<rt>あか</rt></ruby>ちゃんや<ruby>小<rt>ちい</rt></ruby>さい<ruby>子<rt>こ</rt></ruby>の<ruby>機嫌<rt>きげん</rt></ruby>がよくなるように、<ruby>声<rt>こえ</rt></ruby>をかけたり、だっこして<ruby>動<rt>うご</rt></ruby>かしたりすることです。<ruby>駅<rt>えき</rt></ruby>でゆみ<ruby>子<rt>こ</rt></ruby>が<ruby>泣<rt>な</rt></ruby>いたとき、お<ruby>母<rt>かあ</rt></ruby>さんは、<ruby>戦争<rt>せんそう</rt></ruby>へ<ruby>行<rt>い</rt></ruby>くお<ruby>父<rt>とう</rt></ruby>さんに<ruby>泣<rt>な</rt></ruby>き<ruby>顔<rt>がお</rt></ruby>を<ruby>見<rt>み</rt></ruby>せたくないように、ゆみ<ruby>子<rt>こ</rt></ruby>をあやします。", "visual": "👶"}, {"id": "meaning_iyoiyo", "type": "meaning", "word": "いよいよ", "prompt": "<ruby>物語<rt>ものがたり</rt></ruby>の「いよいよ」に<ruby>近<rt>ちか</rt></ruby>い<ruby>意味<rt>いみ</rt></ruby>はどれ？", "options": [{"text": "もうすぐ<ruby>汽車<rt>きしゃ</rt></ruby>がやってきて、そのときが<ruby>来<rt>く</rt></ruby>る", "correct": true}, {"text": "<ruby>汽車<rt>きしゃ</rt></ruby>が<ruby>来<rt>く</rt></ruby>るのは、まだずっと<ruby>先<rt>さき</rt></ruby>である", "correct": false}, {"text": "<ruby>汽車<rt>きしゃ</rt></ruby>はたぶん<ruby>来<rt>こ</rt></ruby>ないだろう", "correct": false}], "explain": "「いよいよ」には、とうとう・ついに、という<ruby>意味<rt>いみ</rt></ruby>があります。この<ruby>場面<rt>ばめん</rt></ruby>では、もうすぐ<ruby>汽車<rt>きしゃ</rt></ruby>がやってきそうで、お<ruby>父<rt>とう</rt></ruby>さんとの<ruby>別<rt>わか</rt></ruby>れの<ruby>時<rt>とき</rt></ruby>が<ruby>近<rt>ちか</rt></ruby>づいている、ということですね。", "visual": "🚂"}, {"id": "meaning_aruiwa", "type": "meaning", "word": "あるいは", "prompt": "「あるいは」と<ruby>同<rt>おな</rt></ruby>じような<ruby>意味<rt>いみ</rt></ruby>はどれ？", "options": [{"text": "または", "correct": true}, {"text": "だから", "correct": false}, {"text": "かならず", "correct": false}], "explain": "「あるいは」は、「または」「もしかすると、こちらかもしれない」というように、ほかの<ruby>考<rt>かんが</rt></ruby>えや<ruby>可能性<rt>かのうせい</rt></ruby>を<ruby>出<rt>だ</rt></ruby>すときに<ruby>使<rt>つか</rt></ruby>います。<ruby>十年後<rt>じゅうねんご</rt></ruby>の<ruby>場面<rt>ばめん</rt></ruby>では、ゆみ<ruby>子<rt>こ</rt></ruby>がお<ruby>父<rt>とう</rt></ruby>さんがいたことを<ruby>知<rt>し</rt></ruby>らないのかもしれない、という<ruby>可能性<rt>かのうせい</rt></ruby>を<ruby>表<rt>あらわ</rt></ruby>しています。", "visual": "↔️"}, {"id": "meaning_sensou", "type": "meaning", "word": "<ruby>戦争<rt>せんそう</rt></ruby>", "prompt": "「<ruby>戦争<rt>せんそう</rt></ruby>」とは、どんなこと？", "options": [{"text": "<ruby>国<rt>くに</rt></ruby>や<ruby>大<rt>おお</rt></ruby>きな<ruby>集団<rt>しゅうだん</rt></ruby>どうしが、<ruby>武器<rt>ぶき</rt></ruby>などを<ruby>使<rt>つか</rt></ruby>って<ruby>争<rt>あらそ</rt></ruby>うこと", "correct": true}, {"text": "スポーツの<ruby>試合<rt>しあい</rt></ruby>で、ルールを<ruby>守<rt>まも</rt></ruby>って<ruby>競<rt>きそ</rt></ruby>うこと", "correct": false}, {"text": "<ruby>話<rt>はな</rt></ruby>し<ruby>合<rt>あ</rt></ruby>って、みんなで<ruby>一<rt>ひと</rt></ruby>つの<ruby>考<rt>かんが</rt></ruby>えを<ruby>決<rt>き</rt></ruby>めること", "correct": false}], "explain": "<ruby>戦争<rt>せんそう</rt></ruby>は、<ruby>国<rt>くに</rt></ruby>などが<ruby>武器<rt>ぶき</rt></ruby>を<ruby>使<rt>つか</rt></ruby>って<ruby>争<rt>あらそ</rt></ruby>うことです。『<ruby>一<rt>ひと</rt></ruby>つの<ruby>花<rt>はな</rt></ruby>』では、<ruby>戦争<rt>せんそう</rt></ruby>のために<ruby>食<rt>た</rt></ruby>べ<ruby>物<rt>もの</rt></ruby>が<ruby>足<rt>た</rt></ruby>りず、お<ruby>父<rt>とう</rt></ruby>さんも<ruby>家族<rt>かぞく</rt></ruby>と<ruby>別<rt>わか</rt></ruby>れて<ruby>戦争<rt>せんそう</rt></ruby>へ<ruby>行<rt>い</rt></ruby>かなければなりません。<ruby>物語<rt>ものがたり</rt></ruby>の<ruby>生活<rt>せいかつ</rt></ruby>の<ruby>苦<rt>くる</rt></ruby>しさにつながる<ruby>大切<rt>たいせつ</rt></ruby>な<ruby>言葉<rt>ことば</rt></ruby>です。", "visual": "🕊️"}, {"id": "meaning_houtai", "type": "meaning", "word": "<ruby>包帯<rt>ほうたい</rt></ruby>", "prompt": "「<ruby>包帯<rt>ほうたい</rt></ruby>」は、<ruby>何<rt>なん</rt></ruby>のために<ruby>使<rt>つか</rt></ruby>うもの？", "options": [{"text": "けがをしたところを<ruby>守<rt>まも</rt></ruby>ったり、<ruby>血<rt>ち</rt></ruby>を<ruby>止<rt>と</rt></ruby>めたりするため", "correct": true}, {"text": "<ruby>食<rt>た</rt></ruby>べ<ruby>物<rt>もの</rt></ruby>を<ruby>温<rt>あたた</rt></ruby>かいまま<ruby>運<rt>はこ</rt></ruby>ぶため", "correct": false}, {"text": "<ruby>雨<rt>あめ</rt></ruby>にぬれないように<ruby>頭<rt>あたま</rt></ruby>にかぶるため", "correct": false}], "explain": "<ruby>包帯<rt>ほうたい</rt></ruby>は、けがをしたところを<ruby>守<rt>まも</rt></ruby>ったり、<ruby>血<rt>ち</rt></ruby>を<ruby>止<rt>と</rt></ruby>める<ruby>手助<rt>てだす</rt></ruby>けをしたりするために<ruby>巻<rt>ま</rt></ruby>く<ruby>布<rt>ぬの</rt></ruby>などです。お<ruby>父<rt>とう</rt></ruby>さんを<ruby>見送<rt>みおく</rt></ruby>るとき、お<ruby>母<rt>かあ</rt></ruby>さんのかばんには、<ruby>包帯<rt>ほうたい</rt></ruby>やお<ruby>薬<rt>くすり</rt></ruby>、<ruby>配給<rt>はいきゅう</rt></ruby>のきっぷ、おにぎりなどが<ruby>入<rt>はい</rt></ruby>っています。<ruby>戦争中<rt>せんそうちゅう</rt></ruby>の<ruby>不安<rt>ふあん</rt></ruby>なくらしも<ruby>感<rt>かん</rt></ruby>じられます。", "visual": "🩹"}];
+let EMBEDDED_IMAGES = {};
+try {
+  EMBEDDED_IMAGES = JSON.parse(document.getElementById("embeddedImages").textContent || "{}");
+} catch(e) {
+  EMBEDDED_IMAGES = {};
+}
+const IS_OFFLINE_BUILD = Object.keys(EMBEDDED_IMAGES).length === Object.keys(COMMONS_FILES).length;
+
+let quiz=[], index=0, firstTryCorrect=0, totalMistakes=0, hadMistake=false, answered=false;
+const $=s=>document.querySelector(s);
+const startScreen=$("#startScreen"), quizScreen=$("#quizScreen"), endScreen=$("#endScreen");
+const countEl=$("#count"), barEl=$("#bar"), wordEl=$("#word"), promptEl=$("#prompt"), choicesEl=$("#choices");
+const feedbackEl=$("#feedback"), feedbackTitle=$("#feedbackTitle"), feedbackBody=$("#feedbackBody"), nextBtn=$("#nextBtn");
+
+if (IS_OFFLINE_BUILD) {
+  $("#builderArea").classList.add("hidden");
+  $("#offlineBadge").style.display="block";
+}
+
+function shuffle(arr) {
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  return a;
+}
+function imageSrc(key){ return EMBEDDED_IMAGES[key] || REMOTE_IMAGES[key]; }
+
+function startQuiz(){
+  quiz=shuffle(QUESTION_POOL).slice(0,10).map(q=>{const qq=JSON.parse(JSON.stringify(q));qq.options=shuffle(qq.options);return qq;});
+  index=0;firstTryCorrect=0;totalMistakes=0;
+  startScreen.classList.add("hidden");endScreen.classList.add("hidden");quizScreen.classList.remove("hidden");
+  renderQuestion();
+}
+function renderQuestion(){
+  const q=quiz[index];hadMistake=false;answered=false;
+  countEl.textContent=`${index+1} / ${quiz.length}`;barEl.style.width=`${(index/quiz.length)*100}%`;
+  wordEl.innerHTML=q.word;promptEl.innerHTML=q.prompt;choicesEl.innerHTML="";
+  feedbackEl.className="feedback";feedbackTitle.textContent="";feedbackBody.innerHTML="";
+  nextBtn.style.display="none";nextBtn.textContent=index===quiz.length-1?"けっかを見る":"つぎへ";
+  q.type==="photo"?renderPhotoChoices(q):renderMeaningChoices(q);
+}
+function renderMeaningChoices(q){
+  const grid=document.createElement("div");grid.className="meaning-grid";
+  q.options.forEach(opt=>{const btn=document.createElement("button");btn.className="choice";btn.type="button";btn.innerHTML=opt.text;btn.addEventListener("click",()=>checkAnswer(q,opt,btn,grid));grid.appendChild(btn);});
+  choicesEl.appendChild(grid);
+}
+function renderPhotoChoices(q){
+  const grid=document.createElement("div");grid.className="photo-grid";
+  q.options.forEach(opt=>{
+    const btn=document.createElement("button");btn.className="photo-choice";btn.type="button";btn.setAttribute("aria-label","写真をえらぶ");
+    const img=document.createElement("img");img.src=imageSrc(opt.key);img.alt="";img.loading="eager";img.referrerPolicy="no-referrer";
+    img.onerror=()=>{const ph=document.createElement("div");ph.className="img-error";ph.textContent=IS_OFFLINE_BUILD?"画像データを表示できません":"写真を読みこめません。ネット接続を確認してください。";img.replaceWith(ph);};
+    btn.appendChild(img);btn.addEventListener("click",()=>checkAnswer(q,opt,btn,grid));grid.appendChild(btn);
+  });
+  choicesEl.appendChild(grid);
+}
+function checkAnswer(q,opt,btn,grid){
+  if(answered||btn.disabled)return;
+  if(opt.correct){
+    answered=true;btn.classList.add("correct");if(!hadMistake)firstTryCorrect++;
+    [...grid.querySelectorAll("button")].forEach(b=>b.disabled=true);
+    feedbackEl.className="feedback show good";feedbackTitle.innerHTML="⭕ <ruby>正解<rt>せいかい</rt></ruby>！";
+    feedbackBody.innerHTML=`<span class="illust">${q.visual||"✨"}</span>${q.explain}`;
+    nextBtn.style.display="inline-block";barEl.style.width=`${((index+1)/quiz.length)*100}%`;
+  } else {
+    hadMistake=true;totalMistakes++;btn.classList.add("wrong");btn.disabled=true;
+    feedbackEl.className="feedback show bad";feedbackTitle.textContent="△ おしい！";
+    feedbackBody.textContent="もういちど、ちがうものをえらんでみよう。";
+  }
+}
+function goNext(){if(!answered)return;index++;index>=quiz.length?showEnd():renderQuestion();}
+function showEnd(){
+  quizScreen.classList.add("hidden");endScreen.classList.remove("hidden");
+  $("#score").textContent=`10もん中 ${firstTryCorrect}もん！`;
+  const msg=firstTryCorrect===10?"ぜんぶ1かいめでせいかい！すごい！":firstTryCorrect>=8?"よくできました！ことばのいみがしっかりわかっています。":firstTryCorrect>=5?"よくがんばりました！もう一度やると、ちがう問題も出ます。":"さいごまでできました！もう一度ちょうせんして、ことばをおぼえよう。";
+  $("#detail").innerHTML=`${msg}<br><span style="font-size:.9em">まちがえたかいすう：${totalMistakes}回</span>`;
+}
+$("#startBtn").addEventListener("click",startQuiz);
+$("#restartBtn").addEventListener("click",startQuiz);
+nextBtn.addEventListener("click",goNext);
+
+function blobToDataURL(blob){
+  return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob);});
+}
+async function buildOffline(){
+  const btn=$("#buildBtn"), status=$("#buildStatus"), save=$("#saveLink");
+  btn.disabled=true;
+  save.style.display="none";
+  status.textContent="写真を取り込む準備をしています…";
+
+  const data={};
+  const entries=Object.entries(COMMONS_FILES);
+
+  try {
+    for(let i=0;i<entries.length;i++){
+      const [key,filename]=entries[i];
+      status.textContent=`写真を確認・取り込み中… ${i+1} / ${entries.length}\n${filename}`;
+
+      // 固定URLを使わず、Wikimedia Commons APIから
+      // その時点で有効な800px画像URLを取得する。
+      const api =
+        "https://commons.wikimedia.org/w/api.php" +
+        "?action=query&format=json&origin=*" +
+        "&prop=imageinfo&iiprop=url&iiurlwidth=800" +
+        "&titles=" + encodeURIComponent("File:" + filename);
+
+      const metaRes = await fetch(api, {cache:"no-store"});
+      if(!metaRes.ok){
+        throw new Error(`${filename}：画像情報の取得に失敗（HTTP ${metaRes.status}）`);
+      }
+
+      const meta = await metaRes.json();
+      const pages = meta?.query?.pages ? Object.values(meta.query.pages) : [];
+      const page = pages[0];
+
+      if(!page || page.missing !== undefined || !page.imageinfo || !page.imageinfo[0]){
+        throw new Error(`${filename}：Wikimedia Commonsで画像が見つかりません`);
+      }
+
+      const info = page.imageinfo[0];
+      const imageUrl = info.thumburl || info.url;
+
+      const imgRes = await fetch(imageUrl, {mode:"cors", cache:"no-store"});
+      if(!imgRes.ok){
+        throw new Error(`${filename}：写真の取得に失敗（HTTP ${imgRes.status}）`);
+      }
+
+      data[key] = await blobToDataURL(await imgRes.blob());
+    }
+
+    status.textContent="HTMLを作っています…";
+
+    const clone=document.documentElement.cloneNode(true);
+    clone.querySelector("#embeddedImages").textContent=
+      JSON.stringify(data).replace(/</g,"\\u003c");
+
+    const cloneBuilder=clone.querySelector("#builderArea");
+    if(cloneBuilder) cloneBuilder.classList.add("hidden");
+
+    const cloneBadge=clone.querySelector("#offlineBadge");
+    if(cloneBadge) cloneBadge.style.display="block";
+
+    const serialized="<!doctype html>\n"+clone.outerHTML;
+    const fileBlob=new Blob([serialized],{type:"text/html;charset=utf-8"});
+
+    const old=save.dataset.bloburl;
+    if(old) URL.revokeObjectURL(old);
+
+    const blobUrl=URL.createObjectURL(fileBlob);
+    save.href=blobUrl;
+    save.dataset.bloburl=blobUrl;
+    save.style.display="inline-block";
+
+    status.textContent=
+      "完成しました！ 下の「完成したHTMLを保存」を押してください。\n" +
+      "保存したHTMLは、ネットなしでも実物写真つきで動きます。";
+  } catch(err) {
+    console.error(err);
+    status.textContent=
+      "写真を取り込めませんでした。\n" +
+      (err?.message || String(err)) +
+      "\nこの表示が出た場合は、そのまま内容を教えてください。";
+    btn.disabled=false;
+  }
+}
+$("#buildBtn").addEventListener("click",buildOffline);
+</script>
+</body>
+</html>
